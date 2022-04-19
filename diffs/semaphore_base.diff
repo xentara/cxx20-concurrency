@@ -1,0 +1,82 @@
+30,31c30,31
+< #ifndef _GLIBCXX_SEMAPHORE_BASE_H
+< #define _GLIBCXX_SEMAPHORE_BASE_H 1
+---
+> #ifndef CXX20_CONCURRENCY_SEMAPHORE_BASE_H
+> #define CXX20_CONCURRENCY_SEMAPHORE_BASE_H 1
+34a35,36
+> #include <bits/c++20-concurrency/global.h>
+> 
+36,37c38,39
+< #if __cpp_lib_atomic_wait
+< #include <bits/atomic_timed_wait.h>
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
+> #include <bits/c++20-concurrency/atomic_timed_wait.h>
+39c41
+< #endif // __cpp_lib_atomic_wait
+---
+> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
+41c43
+< #ifdef _GLIBCXX_HAVE_POSIX_SEMAPHORE
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
+51c53,56
+< namespace std _GLIBCXX_VISIBILITY(default)
+---
+> namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
+> {
+>     
+> inline namespace CXX20_CONCURRENCY_NAMESPACE
+53d57
+< _GLIBCXX_BEGIN_NAMESPACE_VERSION
+55c59
+< #ifdef _GLIBCXX_HAVE_POSIX_SEMAPHORE
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
+185c189
+< #endif // _GLIBCXX_HAVE_POSIX_SEMAPHORE
+---
+> #endif // CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
+187c191
+< #if __cpp_lib_atomic_wait
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
+191c195
+<     explicit __atomic_semaphore(__detail::__platform_wait_t __count) noexcept
+---
+>     explicit __atomic_semaphore(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t __count) noexcept
+201c205
+<     _S_do_try_acquire(__detail::__platform_wait_t* __counter) noexcept
+---
+>     _S_do_try_acquire(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __counter) noexcept
+226c230
+<       return std::__detail::__atomic_spin(__pred);
+---
+>       return std::CXX20_CONCURRENCY_DETAIL_NAMESPACE::__atomic_spin(__pred);
+265,266c269,270
+<     alignas(__detail::__platform_wait_alignment)
+<     __detail::__platform_wait_t _M_counter;
+---
+>     alignas(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_alignment)
+>     CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t _M_counter;
+268c272
+< #endif // __cpp_lib_atomic_wait
+---
+> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
+272c276
+< #if defined __cpp_lib_atomic_wait && !_GLIBCXX_USE_POSIX_SEMAPHORE
+---
+> #if defined CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT && !_GLIBCXX_USE_POSIX_SEMAPHORE
+274c278
+< #elif _GLIBCXX_HAVE_POSIX_SEMAPHORE
+---
+> #elif CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
+278c282
+< _GLIBCXX_END_NAMESPACE_VERSION
+---
+> } // namespace CXX20_CONCURRENCY_NAMESPACE
+280c284
+< #endif // _GLIBCXX_SEMAPHORE_BASE_H
+---
+> #endif // CXX20_CONCURRENCY_SEMAPHORE_BASE_H

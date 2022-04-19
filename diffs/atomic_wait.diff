@@ -1,0 +1,167 @@
+30,31c30,31
+< #ifndef _GLIBCXX_ATOMIC_WAIT_H
+< #define _GLIBCXX_ATOMIC_WAIT_H 1
+---
+> #ifndef CXX20_CONCURRENCY_ATOMIC_WAIT_H
+> #define CXX20_CONCURRENCY_ATOMIC_WAIT_H 1
+34a35,36
+> #include <bits/c++20-concurrency/global.h>
+> 
+36c38
+< #if defined _GLIBCXX_HAS_GTHREADS || defined _GLIBCXX_HAVE_LINUX_FUTEX
+---
+> #if defined CXX20_CONCURRENCY_HAVE_GTHREADS || defined CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+41c43
+< #ifdef _GLIBCXX_HAVE_LINUX_FUTEX
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+49c51,52
+< # include <bits/std_mutex.h>  // std::mutex, std::__condvar
+---
+> #include <mutex>
+> #include <condition_variable>
+51c54,55
+< #define __cpp_lib_atomic_wait 201907L
+---
+> namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
+> {
+53c57
+< namespace std _GLIBCXX_VISIBILITY(default)
+---
+> inline namespace CXX20_CONCURRENCY_NAMESPACE
+55,56c59,60
+< _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<   namespace __detail
+---
+> 
+>   namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+58,59c62,63
+< #ifdef _GLIBCXX_HAVE_LINUX_FUTEX
+< #define _GLIBCXX_HAVE_PLATFORM_WAIT 1
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+> #define CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT 1
+71c75
+<   } // namespace __detail
+---
+>   } // namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+75c79
+< #ifdef _GLIBCXX_HAVE_PLATFORM_WAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+77,78c81,82
+< 	&& ((sizeof(_Tp) == sizeof(__detail::__platform_wait_t))
+< 	&& (alignof(_Tp*) >= __detail::__platform_wait_alignment));
+---
+> 	&& ((sizeof(_Tp) == sizeof(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t))
+> 	&& (alignof(_Tp*) >= CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_alignment));
+83c87
+<   namespace __detail
+---
+>   namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+85c89
+< #ifdef _GLIBCXX_HAVE_LINUX_FUTEX
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+130c134
+< #if defined _GLIBCXX_HAS_GTHREADS && defined _GLIBCXX_USE_SCHED_YIELD
+---
+> #if defined CXX20_CONCURRENCY_HAVE_GTHREADS && defined _GLIBCXX_USE_SCHED_YIELD
+164c168
+< 	    __detail::__thread_relax();
+---
+> 	    CXX20_CONCURRENCY_DETAIL_NAMESPACE::__thread_relax();
+171c175
+< 	    __detail::__thread_yield();
+---
+> 	    CXX20_CONCURRENCY_DETAIL_NAMESPACE::__thread_yield();
+201c205
+< #ifndef _GLIBCXX_HAVE_PLATFORM_WAIT
+---
+> #ifndef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+207c211
+< #ifndef _GLIBCXX_HAVE_PLATFORM_WAIT
+---
+> #ifndef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+234c238
+< #ifdef _GLIBCXX_HAVE_PLATFORM_WAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+259c263
+< #ifdef _GLIBCXX_HAVE_PLATFORM_WAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+269c273
+< #endif // __GLIBCXX_HAVE_PLATFORM_WAIT
+---
+> #endif // CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+329c333
+< 	      { return !__detail::__atomic_compare(__old, __vfn()); };
+---
+> 	      { return !CXX20_CONCURRENCY_DETAIL_NAMESPACE::__atomic_compare(__old, __vfn()); };
+401c405
+< 	    while (__detail::__atomic_compare(__old, __vfn()));
+---
+> 	    while (CXX20_CONCURRENCY_DETAIL_NAMESPACE::__atomic_compare(__old, __vfn()));
+421c425
+<   } // namespace __detail
+---
+>   } // namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+428c432
+<       __detail::__enters_wait __w(__addr);
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_wait __w(__addr);
+436c440
+<       __detail::__enters_wait __w(__addr);
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_wait __w(__addr);
+443c447
+<     __atomic_wait_address_bare(const __detail::__platform_wait_t* __addr,
+---
+>     __atomic_wait_address_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+446c450
+< #ifdef _GLIBCXX_HAVE_PLATFORM_WAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+449,450c453,454
+< 	  __detail::__platform_wait_t __val;
+< 	  if (__detail::__bare_wait::_S_do_spin(__addr, __pred, __val))
+---
+> 	  CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t __val;
+> 	  if (CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait::_S_do_spin(__addr, __pred, __val))
+452c456
+< 	  __detail::__platform_wait(__addr, __val);
+---
+> 	  CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait(__addr, __val);
+455,456c459,460
+< #else // !_GLIBCXX_HAVE_PLATFORM_WAIT
+<       __detail::__bare_wait __w(__addr);
+---
+> #else // !CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait __w(__addr);
+465c469
+<       __detail::__bare_wait __w(__addr);
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait __w(__addr);
+471c475
+<   __atomic_notify_address_bare(const __detail::__platform_wait_t* __addr,
+---
+>   __atomic_notify_address_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+474,475c478,479
+< #ifdef _GLIBCXX_HAVE_PLATFORM_WAIT
+<     __detail::__platform_notify(__addr, __all);
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
+>     CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_notify(__addr, __all);
+477c481
+<     __detail::__bare_wait __w(__addr);
+---
+>     CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait __w(__addr);
+481c485
+< _GLIBCXX_END_NAMESPACE_VERSION
+---
+> } // namespace CXX20_CONCURRENCY_NAMESPACE
+484c488
+< #endif // _GLIBCXX_ATOMIC_WAIT_H
+---
+> #endif // CXX20_CONCURRENCY_ATOMIC_WAIT_H

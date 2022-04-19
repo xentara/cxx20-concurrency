@@ -1,0 +1,4 @@
+This directory contains diffs for the files taken from the corresponding files
+in libstdc++. The diffs are based on branch releases/gcc-11 of
+https://gcc.gnu.org/git/gcc.git. The exact commit is
+448e9a5393998ffa26be862b74509d8579fe75b1.

@@ -1,0 +1,131 @@
+30,31c30,31
+< #ifndef _GLIBCXX_ATOMIC_TIMED_WAIT_H
+< #define _GLIBCXX_ATOMIC_TIMED_WAIT_H 1
+---
+> #ifndef CXX20_CONCURRENCY_ATOMIC_TIMED_WAIT_H
+> #define CXX20_CONCURRENCY_ATOMIC_TIMED_WAIT_H 1
+35c35
+< #include <bits/atomic_wait.h>
+---
+> #include <bits/c++20-concurrency/atomic_wait.h>
+37c37
+< #if __cpp_lib_atomic_wait
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
+39d38
+< #include <bits/this_thread_sleep.h>
+40a40
+> #include <thread>
+43c43
+< #ifdef _GLIBCXX_HAVE_LINUX_FUTEX
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+48c48
+< namespace std _GLIBCXX_VISIBILITY(default)
+---
+> namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
+50d49
+< _GLIBCXX_BEGIN_NAMESPACE_VERSION
+52c51,54
+<   namespace __detail
+---
+> inline namespace CXX20_CONCURRENCY_NAMESPACE
+> {
+> 
+>   namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+76,77c78,79
+< #ifdef _GLIBCXX_HAVE_LINUX_FUTEX
+< #define _GLIBCXX_HAVE_PLATFORM_TIMED_WAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+> #define CXX20_CONCURRENCY_HAVE_PLATFORM_TIMED_WAIT
+137c139
+< // define _GLIBCXX_HAVE_PLATFORM_TIMED_WAIT and implement __platform_wait_until()
+---
+> // define CXX20_CONCURRENCY_HAVE_PLATFORM_TIMED_WAIT and implement __platform_wait_until()
+146c148
+<       __cond_wait_until_impl(__condvar& __cv, mutex& __mx,
+---
+>       __cond_wait_until_impl(condition_variable& __cv, mutex& __mx,
+161c163
+< #ifdef _GLIBCXX_USE_PTHREAD_COND_CLOCKWAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT
+163c165
+< 	  __cv.wait_until(__mx, CLOCK_MONOTONIC, __ts);
+---
+>       pthread_cond_clockwait(__cv.native_handle(), __mx.native_handle(), CLOCK_MONOTONIC, &__ts);
+166c168
+< 	  __cv.wait_until(__mx, __ts);
+---
+> 	  __gthread_cond_timedwait(__cv.native_handle(), __mx.native_handle(), &__ts);
+173c175
+<       __cond_wait_until(__condvar& __cv, mutex& __mx,
+---
+>       __cond_wait_until(condition_variable& __cv, mutex& __mx,
+176c178
+< #ifdef _GLIBCXX_USE_PTHREAD_COND_CLOCKWAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT
+178c180
+< 	  return __detail::__cond_wait_until_impl(__cv, __mx, __atime);
+---
+> 	  return CXX20_CONCURRENCY_DETAIL_NAMESPACE::__cond_wait_until_impl(__cv, __mx, __atime);
+182c184
+< 	  return __detail::__cond_wait_until_impl(__cv, __mx, __atime);
+---
+> 	  return CXX20_CONCURRENCY_DETAIL_NAMESPACE::__cond_wait_until_impl(__cv, __mx, __atime);
+206c208
+< #ifdef _GLIBCXX_HAVE_PLATFORM_TIMED_WAIT
+---
+> #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_TIMED_WAIT
+218c220
+< #endif // _GLIBCXX_HAVE_PLATFORM_TIMED_WAIT
+---
+> #endif // CXX20_CONCURRENCY_HAVE_PLATFORM_TIMED_WAIT
+379c381
+<   } // namespace __detail
+---
+>   } // namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+389c391
+<       __detail::__enters_timed_wait __w{__addr};
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+400c402
+<       __detail::__enters_timed_wait __w{__addr};
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+407c409
+<     __atomic_wait_address_until_bare(const __detail::__platform_wait_t* __addr,
+---
+>     __atomic_wait_address_until_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+412c414
+<       __detail::__bare_timed_wait __w{__addr};
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_timed_wait __w{__addr};
+422c424
+<       __detail::__enters_timed_wait __w{__addr};
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+433c435
+<       __detail::__enters_timed_wait __w{__addr};
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+440c442
+<     __atomic_wait_address_for_bare(const __detail::__platform_wait_t* __addr,
+---
+>     __atomic_wait_address_for_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+444c446
+<       __detail::__bare_timed_wait __w{__addr};
+---
+>       CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_timed_wait __w{__addr};
+447c449
+< _GLIBCXX_END_NAMESPACE_VERSION
+---
+> } // namespace CXX20_CONCURRENCY_NAMESPACE
+449,450c451,452
+< #endif // __cpp_lib_atomic_wait
+< #endif // _GLIBCXX_ATOMIC_TIMED_WAIT_H
+---
+> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
+> #endif // CXX20_CONCURRENCY_ATOMIC_TIMED_WAIT_H

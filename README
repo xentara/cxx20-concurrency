@@ -1,0 +1,4 @@
+This library contains C++20 std::counting_semaphore, std::binary_semaphore,
+std::barrier, and std::latch. These meant as substitutes for these functions
+for libstdc++ 10 and earlier, where they are missing. The implementations are
+simply backported from gcc-11.
