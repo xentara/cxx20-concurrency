@@ -8,7 +8,7 @@
 < #pragma GCC system_header
 ---
 > #include <version>
-34c34,42
+34c34,40
 < #if __cplusplus > 201703L
 ---
 > #if __cplusplus < 202002L
@@ -17,48 +17,43 @@
 > 
 > #if defined __GLIBCXX__ && !defined __cpp_lib_latch
 > 
-> #define CXX20_CONCURRENCY_PREVENT_RECURSION
-> 
 > #include <bits/c++20-concurrency/global.h>
-36a45
+36a43
 > #include <bits/c++20-concurrency/atomic_wait.h>
-39,40c48,49
+39,40c46,47
 < #if __cpp_lib_atomic_wait
 < namespace std _GLIBCXX_VISIBILITY(default)
 ---
 > #if defined CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
 > namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
-42d50
+42d48
 < _GLIBCXX_BEGIN_NAMESPACE_VERSION
-44c52,53
+44c50,51
 < #define __cpp_lib_latch 201907L
 ---
 > inline namespace CXX20_CONCURRENCY_NAMESPACE
 > {
-51c60
+51c58
 <     { return __gnu_cxx::__int_traits<__detail::__platform_wait_t>::__max; }
 ---
->     { return __gnu_cxx::__int_traits<CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t>::__max; }
-66c75
+>     { return __gnu_cxx::__int_traits<CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t>::__max; }
+66c73
 < 	__atomic_impl::notify_all(&_M_a);
 ---
 > 	  std::__atomic_notify_address(&_M_a, true);
-88c97
+88c95
 <     alignas(__alignof__(__detail::__platform_wait_t)) __detail::__platform_wait_t _M_a;
 ---
->     alignas(__alignof__(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t)) CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t _M_a;
-90c99
+>     alignas(__alignof__(CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t)) CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t _M_a;
+90c97
 < _GLIBCXX_END_NAMESPACE_VERSION
 ---
 > } // namespace CXX20_CONCURRENCY_NAMESPACE
-92,94c101,106
+92,94c99,101
 < #endif // __cpp_lib_atomic_wait
 < #endif // __cplusplus > 201703L
 < #endif // _GLIBCXX_LATCH
 ---
 > #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
-> 
-> #undef	CXX20_CONCURRENCY_PREVENT_RECURSION
-> 
 > #endif // defined __GLIBCXX__ && !defined __cpp_lib_latch
 > #endif // CXX20_LATCH_H

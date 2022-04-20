@@ -23,17 +23,8 @@
 #ifndef CXX20_CONCURRENCY_CONFIG_H
 #define CXX20_CONCURRENCY_CONFIG_H
 
-// whether the thtreading library is gthreads
-#cmakedefine CXX20_CONCURRENCY_HAVE_GTHREADS 1
-
 // whether we have posix semaphores
 #cmakedefine CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE 1
-
-// whether we have pthread_cond_clockwait
-#cmakedefine CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT 1
-
-// whether we have the SYS_futex syscall
-#cmakedefine CXX20_CONCURRENCY_HAVE_LINUX_FUTEX 1
 
 // whether we have FUTEX_PRIVATE_FLAG
 #cmakedefine CXX20_CONCURRENCY_HAVE_LINUX_FUTEX_PRIVATE 1
@@ -44,8 +35,10 @@
 // the ELF visibility used for the namespace
 #define CXX20_CONCURRENCY_VISIBILITY @CXX20_CONCURRENCY_VISIBILITY@
 
+#include <bits/c++config.h>
+
 // whether we have atomic wake support
-#if defined CXX20_CONCURRENCY_HAVE_GTHREADS || defined CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+#if _GLIBCXX_HAS_GTHREADS || _GLIBCXX_HAVE_LINUX_FUTEX
 #	define CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
 #endif
 

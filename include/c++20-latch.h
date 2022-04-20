@@ -37,8 +37,6 @@
 
 #if defined __GLIBCXX__ && !defined __cpp_lib_latch
 
-#define CXX20_CONCURRENCY_PREVENT_RECURSION
-
 #include <bits/c++20-concurrency/global.h>
 
 #include <bits/atomic_base.h>
@@ -57,7 +55,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
   public:
     static constexpr ptrdiff_t
     max() noexcept
-    { return __gnu_cxx::__int_traits<CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t>::__max; }
+    { return __gnu_cxx::__int_traits<CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t>::__max; }
 
     constexpr explicit latch(ptrdiff_t __expected) noexcept
       : _M_a(__expected) { }
@@ -94,13 +92,10 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     }
 
   private:
-    alignas(__alignof__(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t)) CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t _M_a;
+    alignas(__alignof__(CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t)) CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t _M_a;
   };
 } // namespace CXX20_CONCURRENCY_NAMESPACE
 } // namespace
 #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
-
-#undef	CXX20_CONCURRENCY_PREVENT_RECURSION
-
 #endif // defined __GLIBCXX__ && !defined __cpp_lib_latch
 #endif // CXX20_LATCH_H

@@ -33,8 +33,6 @@
 
 #if defined __GLIBCXX__ && !defined __cpp_lib_semaphore
 
-#define CXX20_CONCURRENCY_PREVENT_RECURSION
-
 #include <bits/c++20-concurrency/global.h>
 
 #if defined CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || defined CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
@@ -98,8 +96,5 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 } // namespace std
 
 #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
-
-#undef	CXX20_CONCURRENCY_PREVENT_RECURSION
-
 #endif // defined __GLIBCXX__ && !defined __cpp_lib_semaphore
 #endif // CXX20_SEMAPHORE_H

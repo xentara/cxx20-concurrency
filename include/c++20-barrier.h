@@ -37,13 +37,11 @@
 
 #if defined __GLIBCXX__ && !defined __cpp_lib_barrier
 
-#define CXX20_CONCURRENCY_PREVENT_RECURSION
-
 #include <bits/c++20-concurrency/global.h>
 
 #include <bits/atomic_base.h>
 #if defined CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT && __cpp_aligned_new
-#include <thread>
+#include <bits/c++20-concurrency/std_thread.h>
 #include <bits/unique_ptr.h>
 #include <bits/c++20-concurrency/atomic_wait.h>
 
@@ -167,8 +165,8 @@ It looks different from literature pseudocode for two main reasons:
       [[nodiscard]] arrival_token
       arrive(ptrdiff_t __update)
       {
-	std::hash<std::thread::id> __hasher;
-	size_t __current = __hasher(std::this_thread::get_id());
+	std::hash<std::CXX20_CONCURRENCY_DECORATE_NAME(thread)::id> __hasher;
+	size_t __current = __hasher(std::CXX20_CONCURRENCY_DECORATE_NAME(this_thread)::get_id());
 	__atomic_phase_ref_t __phase(_M_phase);
 	const auto __old_phase = __phase.load(memory_order_relaxed);
 	const auto __cur = static_cast<unsigned char>(__old_phase);
@@ -261,8 +259,5 @@ It looks different from literature pseudocode for two main reasons:
 } // namespace CXX20_CONCURRENCY_NAMESPACE
 } // namespace std
 #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT && __cpp_aligned_new
-
-#undef	CXX20_CONCURRENCY_PREVENT_RECURSION
-
 #endif // __GLIBCXX__ && !defined __cpp_lib_barrier
 #endif // CXX20_BARRIER_H

@@ -21,12 +21,10 @@
 < #include <bits/semaphore_base.h>
 ---
 > #if defined __GLIBCXX__ && !defined __cpp_lib_semaphore
-37,38c36,44
+37,38c36,42
 < #if __cpp_lib_atomic_wait || _GLIBCXX_HAVE_POSIX_SEMAPHORE
 < namespace std _GLIBCXX_VISIBILITY(default)
 ---
-> #define CXX20_CONCURRENCY_PREVENT_RECURSION
-> 
 > #include <bits/c++20-concurrency/global.h>
 > 
 > #if defined CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || defined CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
@@ -34,28 +32,26 @@
 > #include <bits/c++20-concurrency/semaphore_base.h>
 > 
 > namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
-40d45
+40d43
 < _GLIBCXX_BEGIN_NAMESPACE_VERSION
-42c47,48
+42c45,46
 < #define __cpp_lib_semaphore 201907L
 ---
 > inline namespace CXX20_CONCURRENCY_NAMESPACE
 > {
-89a96,102
->   
-> } // namespace CXX20_CONCURRENCY_NAMESPACE
-> } // namespace std
-> 
-> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
-> 
-> #undef	CXX20_CONCURRENCY_PREVENT_RECURSION
-91,95c104,105
+90,95c94,100
+< 
 < _GLIBCXX_END_NAMESPACE_VERSION
 < } // namespace
 < #endif // cpp_lib_atomic_wait || _GLIBCXX_HAVE_POSIX_SEMAPHORE
 < #endif // C++20
 < #endif // _GLIBCXX_SEMAPHORE
 ---
+>   
+> } // namespace CXX20_CONCURRENCY_NAMESPACE
+> } // namespace std
+> 
+> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
 > #endif // defined __GLIBCXX__ && !defined __cpp_lib_semaphore
 > #endif // CXX20_SEMAPHORE_H
 \ No newline at end of file

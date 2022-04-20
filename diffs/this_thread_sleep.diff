@@ -1,0 +1,31 @@
+30,33c30,31
+< #ifndef _GLIBCXX_THIS_THREAD_SLEEP_H
+< #define _GLIBCXX_THIS_THREAD_SLEEP_H 1
+< 
+< #pragma GCC system_header
+---
+> #ifndef CXX20_CONCURRENCY_THIS_THREAD_SLEEP_H
+> #define CXX20_CONCURRENCY_THIS_THREAD_SLEEP_H 1
+36a35
+> #include <bits/c++20-concurrency/global.h>
+45c44,47
+< namespace std _GLIBCXX_VISIBILITY(default)
+---
+> namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
+> {
+>     
+> inline namespace CXX20_CONCURRENCY_NAMESPACE
+47d48
+< _GLIBCXX_BEGIN_NAMESPACE_VERSION
+58c59
+<   namespace this_thread
+---
+>   namespace CXX20_CONCURRENCY_DECORATE_NAME(this_thread)
+115c116
+< _GLIBCXX_END_NAMESPACE_VERSION
+---
+> } // namespace CXX20_CONCURRENCY_NAMESPACE
+119c120
+< #endif // _GLIBCXX_THIS_THREAD_SLEEP_H
+---
+> #endif // CXX20_CONCURRENCY_THIS_THREAD_SLEEP_H

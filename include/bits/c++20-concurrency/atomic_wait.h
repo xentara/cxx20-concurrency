@@ -33,12 +33,12 @@
 #include <bits/c++20-concurrency/global.h>
 
 #include <bits/c++config.h>
-#if defined CXX20_CONCURRENCY_HAVE_GTHREADS || defined CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+#if defined _GLIBCXX_HAS_GTHREADS || defined _GLIBCXX_HAVE_LINUX_FUTEX
 #include <bits/functional_hash.h>
 #include <bits/gthr.h>
 #include <ext/numeric_traits.h>
 
-#ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+#ifdef _GLIBCXX_HAVE_LINUX_FUTEX
 # include <cerrno>
 # include <climits>
 # include <unistd.h>
@@ -46,8 +46,7 @@
 # include <bits/functexcept.h>
 #endif
 
-#include <mutex>
-#include <condition_variable>
+# include <bits/c++20-concurrency/std_mutex.h>  // std::mutex, std::__condvar
 
 namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
 {
@@ -55,9 +54,9 @@ namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
 inline namespace CXX20_CONCURRENCY_NAMESPACE
 {
 
-  namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+  namespace CXX20_CONCURRENCY_DECORATE_NAME(__detail)
   {
-#ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+#ifdef _GLIBCXX_HAVE_LINUX_FUTEX
 #define CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT 1
     using __platform_wait_t = int;
     static constexpr size_t __platform_wait_alignment = 4;
@@ -70,21 +69,21 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     static constexpr size_t __platform_wait_alignment
       = __alignof__(__platform_wait_t);
 #endif
-  } // namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+  } // namespace __detail
 
   template<typename _Tp>
     inline constexpr bool __platform_wait_uses_type
 #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
       = is_scalar_v<_Tp>
-	&& ((sizeof(_Tp) == sizeof(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t))
-	&& (alignof(_Tp*) >= CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_alignment));
+	&& ((sizeof(_Tp) == sizeof(CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t))
+	&& (alignof(_Tp*) >= CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_alignment));
 #else
       = false;
 #endif
 
-  namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+  namespace CXX20_CONCURRENCY_DECORATE_NAME(__detail)
   {
-#ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+#ifdef _GLIBCXX_HAVE_LINUX_FUTEX
     enum class __futex_wait_flags : int
     {
 #ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX_PRIVATE
@@ -129,7 +128,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     inline void
     __thread_yield() noexcept
     {
-#if defined CXX20_CONCURRENCY_HAVE_GTHREADS && defined _GLIBCXX_USE_SCHED_YIELD
+#if defined _GLIBCXX_HAS_GTHREADS && defined _GLIBCXX_USE_SCHED_YIELD
      __gthread_yield();
 #endif
     }
@@ -163,14 +162,14 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 	  {
 	    if (__pred())
 	      return true;
-	    CXX20_CONCURRENCY_DETAIL_NAMESPACE::__thread_relax();
+	    CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__thread_relax();
 	  }
 
 	for (auto __i = 0; __i < __atomic_spin_count_2; ++__i)
 	  {
 	    if (__pred())
 	      return true;
-	    CXX20_CONCURRENCY_DETAIL_NAMESPACE::__thread_yield();
+	    CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__thread_yield();
 	  }
 
 	while (__spin())
@@ -328,7 +327,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 		       _Spin __spin = _Spin{ })
 	  {
 	    auto const __pred = [=]
-	      { return !CXX20_CONCURRENCY_DETAIL_NAMESPACE::__atomic_compare(__old, __vfn()); };
+	      { return !CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__atomic_compare(__old, __vfn()); };
 
 	    if constexpr (__platform_wait_uses_type<_Up>)
 	      {
@@ -400,7 +399,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 	      {
 		__base_type::_M_w._M_do_wait(__base_type::_M_addr, __val);
 	      }
-	    while (CXX20_CONCURRENCY_DETAIL_NAMESPACE::__atomic_compare(__old, __vfn()));
+	    while (CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__atomic_compare(__old, __vfn()));
 	  }
 
 	template<typename _Pred>
@@ -420,14 +419,14 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 
     using __enters_wait = __waiter<std::true_type>;
     using __bare_wait = __waiter<std::false_type>;
-  } // namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+  } // namespace __detail
 
   template<typename _Tp, typename _ValFn>
     void
     __atomic_wait_address_v(const _Tp* __addr, _Tp __old,
 			    _ValFn __vfn) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_wait __w(__addr);
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__enters_wait __w(__addr);
       __w._M_do_wait_v(__old, __vfn);
     }
 
@@ -435,27 +434,27 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     void
     __atomic_wait_address(const _Tp* __addr, _Pred __pred) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_wait __w(__addr);
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__enters_wait __w(__addr);
       __w._M_do_wait(__pred);
     }
 
   // This call is to be used by atomic types which track contention externally
   template<typename _Pred>
     void
-    __atomic_wait_address_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+    __atomic_wait_address_bare(const CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t* __addr,
 			       _Pred __pred) noexcept
     {
 #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
       do
 	{
-	  CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t __val;
-	  if (CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait::_S_do_spin(__addr, __pred, __val))
+	  CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t __val;
+	  if (CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__bare_wait::_S_do_spin(__addr, __pred, __val))
 	    return;
-	  CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait(__addr, __val);
+	  CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait(__addr, __val);
 	}
       while (!__pred());
 #else // !CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait __w(__addr);
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__bare_wait __w(__addr);
       __w._M_do_wait(__pred);
 #endif
     }
@@ -464,19 +463,19 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     void
     __atomic_notify_address(const _Tp* __addr, bool __all) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait __w(__addr);
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__bare_wait __w(__addr);
       __w._M_notify(__all);
     }
 
   // This call is to be used by atomic types which track contention externally
   inline void
-  __atomic_notify_address_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+  __atomic_notify_address_bare(const CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t* __addr,
 			       bool __all) noexcept
   {
 #ifdef CXX20_CONCURRENCY_HAVE_PLATFORM_WAIT
-    CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_notify(__addr, __all);
+    CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_notify(__addr, __all);
 #else
-    CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_wait __w(__addr);
+    CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__bare_wait __w(__addr);
     __w._M_notify(__all, true);
 #endif
   }

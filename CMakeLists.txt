@@ -42,32 +42,15 @@ set_property(CACHE CXX20_CONCURRENCY_TARGET_TYPE PROPERTY STRINGS SHARED STATIC 
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-try_compile(HAVE_GTHREADS
-	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_gthreads
-	${CMAKE_CURRENT_SOURCE_DIR}/config/check_gthreads.cc
-)
-
 try_compile(HAVE_POSIX_SEMAPHORE
 	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_posix_semaphore
 	${CMAKE_CURRENT_SOURCE_DIR}/config/check_posix_semaphore.cc
 )
 
-try_compile(HAVE_PTHREAD_COND_CLOCKWAIT
-	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_pthread_cond_clockwait
-	${CMAKE_CURRENT_SOURCE_DIR}/config/check_pthread_cond_clockwait.cc
+try_compile(HAVE_LINUX_FUTEX_PRIVATE
+	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_linux_futex_private
+	${CMAKE_CURRENT_SOURCE_DIR}/config/check_linux_futex_private.cc
 )
-
-try_compile(HAVE_LINUX_FUTEX
-	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_linux_futex
-	${CMAKE_CURRENT_SOURCE_DIR}/config/check_linux_futex.cc
-)
-
-if(HAVE_LINUX_FUTEX)
-	try_compile(HAVE_LINUX_FUTEX_PRIVATE
-		${CMAKE_CURRENT_BINARY_DIR}/Checks/check_linux_futex_private
-		${CMAKE_CURRENT_SOURCE_DIR}/config/check_linux_futex_private.cc
-	)
-endif()
 
 try_compile(HAVE_COMPATIBLE_GLIBCXX
 	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_libstdcxx_version
@@ -86,20 +69,8 @@ endif()
 ###########################################################################
 # generate the config include
 
-if(HAVE_GTHREADS)
-	set(CXX20_CONCURRENCY_HAVE_GTHREADS TRUE)
-endif()
-
 if(HAVE_POSIX_SEMAPHORE)
 	set(CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE TRUE)
-endif()
-
-if(HAVE_PTHREAD_COND_CLOCKWAIT)
-	set(CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT TRUE)
-endif()
-
-if(HAVE_LINUX_FUTEX)
-	set(CXX20_CONCURRENCY_HAVE_LINUX_FUTEX TRUE)
 endif()
 
 if(HAVE_LINUX_FUTEX_PRIVATE)
@@ -152,7 +123,10 @@ set_target_properties(
 )
 
 ###########################################################################
-# test applications
+# generate test applications
+#
+# These applications test the interface only. We rely on the original libstdc++ test cases
+# for functional tests
 
 add_executable(
 	semaphore-test
@@ -177,6 +151,35 @@ add_executable(
 )
 
 target_link_libraries(latch-test PRIVATE ${PROJECT_NAME})
+
+###########################################################################
+# define the headers and directories
+
+set(HEADER_FILES 
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/c++20-barrier.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/c++20-concurrency.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/c++20-latch.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/c++20-semaphore.h"
+)
+
+set(PRIVATE_HEADER_FILES 
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/bits/c++20-concurrency/atomic_timed_wait.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/bits/c++20-concurrency/atomic_wait.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/bits/c++20-concurrency/global.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/bits/c++20-concurrency/semaphore_base.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/bits/c++20-concurrency/std_mutex.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/bits/c++20-concurrency/std_thread.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/bits/c++20-concurrency/this_thread_sleep.h"
+	"${CONFIG_HEADER_FILE}"
+)
+
+set(PRIVATE_HEADER_SUBDIR bits/c++20-concurrency)
+
+set(PATCH_STD_HEADER_FILES 
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/std/barrier"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/std/latch"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/std/semaphore"
+)
 
 ###########################################################################
 # export and install the project
@@ -211,26 +214,17 @@ install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets RUNTIME ARCHIVE)
 install(EXPORT ${PROJECT_NAME}-targets NAMESPACE Cxx20Concurrency:: FILE Cxx20ConcurrencyTargets.cmake DESTINATION "${INSTALL_MODULEDIR}")
 
 install(
-	FILES
-		include/bits/c++20-concurrency/atomic_timed_wait.h
-		include/bits/c++20-concurrency/atomic_wait.h
-		include/bits/c++20-concurrency/global.h
-		include/bits/c++20-concurrency/semaphore_base.h
-		include/c++20-barrier.h
-		include/c++20-concurrency.h
-		include/c++20-latch.h
-		include/c++20-semaphore.h
-		"${CONFIG_HEADER_FILE}"
-	
+	FILES ${HEADER_FILES}
 	DESTINATION "${INSTALL_INCLUDEDIR}"
 )
 
 install(
-	FILES
-		include/std/barrier
-		include/std/latch
-		include/std/semaphore
-		
+	FILES ${PRIVATE_HEADER_FILES}
+	DESTINATION "${INSTALL_INCLUDEDIR}/${PRIVATE_HEADER_SUBDIR}"
+)
+
+install(
+	FILES ${PATCH_STD_HEADER_FILES}
 	DESTINATION "${INSTALL_INCLUDEDIR}/std"
 )
 

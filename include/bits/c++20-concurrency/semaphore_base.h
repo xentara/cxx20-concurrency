@@ -190,7 +190,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
   struct __atomic_semaphore
   {
     static constexpr ptrdiff_t _S_max = __gnu_cxx::__int_traits<int>::__max;
-    explicit __atomic_semaphore(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t __count) noexcept
+    explicit __atomic_semaphore(CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t __count) noexcept
       : _M_counter(__count)
     {
       __glibcxx_assert(__count >= 0 && __count <= _S_max);
@@ -200,7 +200,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     __atomic_semaphore& operator=(const __atomic_semaphore&) = delete;
 
     static _GLIBCXX_ALWAYS_INLINE bool
-    _S_do_try_acquire(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __counter) noexcept
+    _S_do_try_acquire(CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t* __counter) noexcept
     {
       auto __old = __atomic_impl::load(__counter, memory_order::acquire);
       if (__old == 0)
@@ -225,7 +225,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     {
       auto const __pred =
 	[this] { return _S_do_try_acquire(&this->_M_counter); };
-      return std::CXX20_CONCURRENCY_DETAIL_NAMESPACE::__atomic_spin(__pred);
+      return std::CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__atomic_spin(__pred);
     }
 
     template<typename _Clock, typename _Duration>
@@ -264,8 +264,8 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     }
 
   private:
-    alignas(CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_alignment)
-    CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t _M_counter;
+    alignas(CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_alignment)
+    CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t _M_counter;
   };
 #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
 

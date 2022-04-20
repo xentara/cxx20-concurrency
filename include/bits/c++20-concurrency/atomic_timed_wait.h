@@ -30,15 +30,17 @@
 #ifndef CXX20_CONCURRENCY_ATOMIC_TIMED_WAIT_H
 #define CXX20_CONCURRENCY_ATOMIC_TIMED_WAIT_H 1
 
+#include <bits/c++20-concurrency/global.h>
+
 #include <bits/c++20-concurrency/atomic_wait.h>
 
 #ifdef CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
 #include <bits/functional_hash.h>
+#include <bits/c++20-concurrency/this_thread_sleep.h>
 
-#include <thread>
 #include <chrono>
 
-#ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+#ifdef _GLIBCXX_HAVE_LINUX_FUTEX
 #include <exception> // std::terminate
 #include <sys/time.h>
 #endif
@@ -49,7 +51,7 @@ namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
 inline namespace CXX20_CONCURRENCY_NAMESPACE
 {
 
-  namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+  namespace CXX20_CONCURRENCY_DECORATE_NAME(__detail)
   {
     using __wait_clock_t = chrono::steady_clock;
 
@@ -73,7 +75,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 	return chrono::ceil<__w_dur>(__atime);
       }
 
-#ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
+#ifdef _GLIBCXX_HAVE_LINUX_FUTEX
 #define CXX20_CONCURRENCY_HAVE_PLATFORM_TIMED_WAIT
     // returns true if wait ended before timeout
     template<typename _Dur>
@@ -143,7 +145,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     // _Clock must be either steady_clock or system_clock.
     template<typename _Clock, typename _Dur>
       bool
-      __cond_wait_until_impl(condition_variable& __cv, mutex& __mx,
+      __cond_wait_until_impl(__condvar& __cv, mutex& __mx,
 			     const chrono::time_point<_Clock, _Dur>& __atime)
       {
 	static_assert(std::__is_one_of<_Clock, chrono::steady_clock,
@@ -158,28 +160,28 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 	    static_cast<long>(__ns.count())
 	  };
 
-#ifdef CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT
+#ifdef _GLIBCXX_USE_PTHREAD_COND_CLOCKWAIT
 	if constexpr (is_same_v<chrono::steady_clock, _Clock>)
-      pthread_cond_clockwait(__cv.native_handle(), __mx.native_handle(), CLOCK_MONOTONIC, &__ts);
+	  __cv.wait_until(__mx, CLOCK_MONOTONIC, __ts);
 	else
 #endif
-	  __gthread_cond_timedwait(__cv.native_handle(), __mx.native_handle(), &__ts);
+	  __cv.wait_until(__mx, __ts);
 	return _Clock::now() < __atime;
       }
 
     // returns true if wait ended before timeout
     template<typename _Clock, typename _Dur>
       bool
-      __cond_wait_until(condition_variable& __cv, mutex& __mx,
+      __cond_wait_until(__condvar& __cv, mutex& __mx,
 	  const chrono::time_point<_Clock, _Dur>& __atime)
       {
-#ifdef CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT
+#ifdef _GLIBCXX_USE_PTHREAD_COND_CLOCKWAIT
 	if constexpr (is_same_v<_Clock, chrono::steady_clock>)
-	  return CXX20_CONCURRENCY_DETAIL_NAMESPACE::__cond_wait_until_impl(__cv, __mx, __atime);
+	  return CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__cond_wait_until_impl(__cv, __mx, __atime);
 	else
 #endif
 	if constexpr (is_same_v<_Clock, chrono::system_clock>)
-	  return CXX20_CONCURRENCY_DETAIL_NAMESPACE::__cond_wait_until_impl(__cv, __mx, __atime);
+	  return CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__cond_wait_until_impl(__cv, __mx, __atime);
 	else
 	  {
 	    if (__cond_wait_until_impl(__cv, __mx,
@@ -244,11 +246,11 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 	auto __elapsed = __now - _M_t0;
 	if (__elapsed > 128ms)
 	  {
-	    this_thread::sleep_for(64ms);
+	    CXX20_CONCURRENCY_DECORATE_NAME(this_thread)::sleep_for(64ms);
 	  }
 	else if (__elapsed > 64us)
 	  {
-	    this_thread::sleep_for(__elapsed / 2);
+	    CXX20_CONCURRENCY_DECORATE_NAME(this_thread)::sleep_for(__elapsed / 2);
 	  }
 	else if (__elapsed > 4us)
 	  {
@@ -376,7 +378,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 
     using __enters_timed_wait = __timed_waiter<std::true_type>;
     using __bare_timed_wait = __timed_waiter<std::false_type>;
-  } // namespace CXX20_CONCURRENCY_DETAIL_NAMESPACE
+  } // namespace __detail
 
   // returns true if wait ended before timeout
   template<typename _Tp, typename _ValFn,
@@ -386,7 +388,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 			const chrono::time_point<_Clock, _Dur>&
 			    __atime) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__enters_timed_wait __w{__addr};
       return __w._M_do_wait_until_v(__old, __vfn, __atime);
     }
 
@@ -397,19 +399,19 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 				const chrono::time_point<_Clock, _Dur>&
 							      __atime) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__enters_timed_wait __w{__addr};
       return __w._M_do_wait_until(__pred, __atime);
     }
 
   template<typename _Pred,
 	   typename _Clock, typename _Dur>
     bool
-    __atomic_wait_address_until_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+    __atomic_wait_address_until_bare(const CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t* __addr,
 				_Pred __pred,
 				const chrono::time_point<_Clock, _Dur>&
 							      __atime) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_timed_wait __w{__addr};
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__bare_timed_wait __w{__addr};
       return __w._M_do_wait_until(__pred, __atime);
     }
 
@@ -419,7 +421,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
     __atomic_wait_address_for_v(const _Tp* __addr, _Tp&& __old, _ValFn&& __vfn,
 		      const chrono::duration<_Rep, _Period>& __rtime) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__enters_timed_wait __w{__addr};
       return __w._M_do_wait_for_v(__old, __vfn, __rtime);
     }
 
@@ -430,18 +432,18 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 		      const chrono::duration<_Rep, _Period>& __rtime) noexcept
     {
 
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__enters_timed_wait __w{__addr};
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__enters_timed_wait __w{__addr};
       return __w._M_do_wait_for(__pred, __rtime);
     }
 
   template<typename _Pred,
 	   typename _Rep, typename _Period>
     bool
-    __atomic_wait_address_for_bare(const CXX20_CONCURRENCY_DETAIL_NAMESPACE::__platform_wait_t* __addr,
+    __atomic_wait_address_for_bare(const CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__platform_wait_t* __addr,
 			_Pred __pred,
 			const chrono::duration<_Rep, _Period>& __rtime) noexcept
     {
-      CXX20_CONCURRENCY_DETAIL_NAMESPACE::__bare_timed_wait __w{__addr};
+      CXX20_CONCURRENCY_DECORATE_NAME(__detail)::__bare_timed_wait __w{__addr};
       return __w._M_do_wait_for(__pred, __rtime);
     }
 } // namespace CXX20_CONCURRENCY_NAMESPACE

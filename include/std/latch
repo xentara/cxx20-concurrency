@@ -20,8 +20,6 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef CXX20_CONCURRENCY_PREVENT_RECURSION
-
 #ifndef CXX20_CONCURRENCY_STD_LATCH
 #define	CXX20_CONCURRENCY_STD_LATCH
 
@@ -34,5 +32,3 @@
 #endif
 
 #endif // CXX20_CONCURRENCY_STD_LATCH
-
-#endif // CXX20_CONCURRENCY_PREVENT_RECURSION

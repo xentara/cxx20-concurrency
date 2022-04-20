@@ -10,7 +10,7 @@
 < #define _GLIBCXX_BARRIER 1
 ---
 > #include <version>
-36c34,42
+36c34,40
 < #pragma GCC system_header
 ---
 > #if __cplusplus < 202002L
@@ -19,35 +19,39 @@
 > 
 > #if defined __GLIBCXX__ && !defined __cpp_lib_barrier
 > 
-> #define CXX20_CONCURRENCY_PREVENT_RECURSION
-> 
 > #include <bits/c++20-concurrency/global.h>
-38d43
+38d41
 < #if __cplusplus > 201703L
-40,41c45,46
+40,41c43,44
 < #if __cpp_lib_atomic_wait && __cpp_aligned_new
 < #include <bits/std_thread.h>
 ---
 > #if defined CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT && __cpp_aligned_new
-> #include <thread>
-42a48
+> #include <bits/c++20-concurrency/std_thread.h>
+42a46
 > #include <bits/c++20-concurrency/atomic_wait.h>
-46c52,53
+46c50,51
 < #define __cpp_lib_barrier 201907L
 ---
 > namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
 > {
-48c55
+48c53
 < namespace std _GLIBCXX_VISIBILITY(default)
 ---
 > inline namespace CXX20_CONCURRENCY_NAMESPACE
-50d56
+50d54
 < _GLIBCXX_BEGIN_NAMESPACE_VERSION
-178c184
+164,165c168,169
+< 	std::hash<std::thread::id> __hasher;
+< 	size_t __current = __hasher(std::this_thread::get_id());
+---
+> 	std::hash<std::CXX20_CONCURRENCY_DECORATE_NAME(thread)::id> __hasher;
+> 	size_t __current = __hasher(std::CXX20_CONCURRENCY_DECORATE_NAME(this_thread)::get_id());
+178c182
 < 		__phase.notify_all();
 ---
 > 		__atomic_notify_address(&_M_phase, true);
-255,259c261,268
+255,259c259,263
 < _GLIBCXX_END_NAMESPACE_VERSION
 < } // namespace
 < #endif // __cpp_lib_atomic_wait && __cpp_aligned_new
@@ -57,8 +61,5 @@
 > } // namespace CXX20_CONCURRENCY_NAMESPACE
 > } // namespace std
 > #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT && __cpp_aligned_new
-> 
-> #undef	CXX20_CONCURRENCY_PREVENT_RECURSION
-> 
 > #endif // __GLIBCXX__ && !defined __cpp_lib_barrier
 > #endif // CXX20_BARRIER_H
