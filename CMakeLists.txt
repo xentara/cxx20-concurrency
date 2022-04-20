@@ -42,14 +42,19 @@ set_property(CACHE CXX20_CONCURRENCY_TARGET_TYPE PROPERTY STRINGS SHARED STATIC 
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
+try_compile(HAVE_GTHREADS
+	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_gthreads
+	${CMAKE_CURRENT_SOURCE_DIR}/config/check_gthreads.cc
+)
+
 try_compile(HAVE_POSIX_SEMAPHORE
 	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_posix_semaphore
 	${CMAKE_CURRENT_SOURCE_DIR}/config/check_posix_semaphore.cc
 )
 
-try_compile(HAVE_GTHREADS
-	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_gthreads
-	${CMAKE_CURRENT_SOURCE_DIR}/config/check_gthreads.cc
+try_compile(HAVE_PTHREAD_COND_CLOCKWAIT
+	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_pthread_cond_clockwait
+	${CMAKE_CURRENT_SOURCE_DIR}/config/check_pthread_cond_clockwait.cc
 )
 
 try_compile(HAVE_LINUX_FUTEX
@@ -57,10 +62,12 @@ try_compile(HAVE_LINUX_FUTEX
 	${CMAKE_CURRENT_SOURCE_DIR}/config/check_linux_futex.cc
 )
 
-try_compile(HAVE_PTHREAD_COND_CLOCKWAIT
-	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_pthread_cond_clockwait
-	${CMAKE_CURRENT_SOURCE_DIR}/config/check_pthread_cond_clockwait.cc
-)
+if(HAVE_LINUX_FUTEX)
+	try_compile(HAVE_LINUX_FUTEX_PRIVATE
+		${CMAKE_CURRENT_BINARY_DIR}/Checks/check_linux_futex_private
+		${CMAKE_CURRENT_SOURCE_DIR}/config/check_linux_futex_private.cc
+	)
+endif()
 
 try_compile(HAVE_COMPATIBLE_GLIBCXX
 	${CMAKE_CURRENT_BINARY_DIR}/Checks/check_libstdcxx_version
@@ -79,6 +86,10 @@ endif()
 ###########################################################################
 # generate the config include
 
+if(HAVE_GTHREADS)
+	set(CXX20_CONCURRENCY_HAVE_GTHREADS TRUE)
+endif()
+
 if(HAVE_POSIX_SEMAPHORE)
 	set(CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE TRUE)
 endif()
@@ -87,12 +98,12 @@ if(HAVE_PTHREAD_COND_CLOCKWAIT)
 	set(CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT TRUE)
 endif()
 
-if(HAVE_GTHREADS)
-	set(CXX20_CONCURRENCY_HAVE_GTHREADS TRUE)
-endif()
-
 if(HAVE_LINUX_FUTEX)
 	set(CXX20_CONCURRENCY_HAVE_LINUX_FUTEX TRUE)
+endif()
+
+if(HAVE_LINUX_FUTEX_PRIVATE)
+	set(CXX20_CONCURRENCY_HAVE_LINUX_FUTEX_PRIVATE TRUE)
 endif()
 
 set(CONFIG_HEADER_FILE "${CMAKE_CURRENT_BINARY_DIR}/include/bits/c++20-concurrency/config.h")
@@ -111,10 +122,11 @@ target_compile_definitions(
 	${PROJECT_NAME}
 
 	PRIVATE
+		$<$<BOOL:${HAVE_GTHREADS}>:CXX20_CONCURRENCY_HAVE_GTHREADS=1>
 		$<$<BOOL:${HAVE_POSIX_SEMAPHORE}>:CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE=1>
 		$<$<BOOL:${HAVE_PTHREAD_COND_CLOCKWAIT}>:CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT=1>
-		$<$<BOOL:${HAVE_GTHREADS}>:CXX20_CONCURRENCY_HAVE_GTHREADS=1>
 		$<$<BOOL:${HAVE_LINUX_FUTEX}>:CXX20_CONCURRENCY_HAVE_LINUX_FUTEX=1>
+		$<$<BOOL:${HAVE_LINUX_FUTEX_PRIVATE}>:CXX20_CONCURRENCY_HAVE_LINUX_FUTEX_PRIVATE=1>
 )
 
 target_include_directories(

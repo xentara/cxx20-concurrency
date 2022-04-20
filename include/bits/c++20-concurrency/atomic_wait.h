@@ -89,7 +89,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 #ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
     enum class __futex_wait_flags : int
     {
-#ifdef _GLIBCXX_HAVE_LINUX_FUTEX_PRIVATE
+#ifdef CXX20_CONCURRENCY_HAVE_LINUX_FUTEX_PRIVATE
       __private_flag = 128,
 #else
       __private_flag = 0,
