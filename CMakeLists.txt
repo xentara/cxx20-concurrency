@@ -170,6 +170,14 @@ add_executable(
 
 target_link_libraries(barrier-test PRIVATE ${PROJECT_NAME})
 
+add_executable(
+	latch-test
+	
+	"test/latch-test.cc"
+)
+
+target_link_libraries(latch-test PRIVATE ${PROJECT_NAME})
+
 ###########################################################################
 # export and install the project
 
@@ -210,6 +218,7 @@ install(
 		include/bits/c++20-concurrency/semaphore_base.h
 		include/c++20-barrier.h
 		include/c++20-concurrency.h
+		include/c++20-latch.h
 		include/c++20-semaphore.h
 		"${CONFIG_HEADER_FILE}"
 	
@@ -219,6 +228,7 @@ install(
 install(
 	FILES
 		include/std/barrier
+		include/std/latch
 		include/std/semaphore
 		
 	DESTINATION "${INSTALL_INCLUDEDIR}/std"
