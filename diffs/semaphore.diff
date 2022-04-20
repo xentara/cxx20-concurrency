@@ -1,23 +1,31 @@
-29,30c29,30
+25,27c25,26
+< /** @file include/semaphore
+<  *  This is a Standard C++ Library header.
+<  */
+---
+> #ifndef CXX20_SEMAPHORE_H
+> #define CXX20_SEMAPHORE_H 1
+29,30c28
 < #ifndef _GLIBCXX_SEMAPHORE
 < #define _GLIBCXX_SEMAPHORE 1
 ---
-> #ifndef CXX20_CONCURRENCY_SEMAPHORE
-> #define CXX20_CONCURRENCY_SEMAPHORE 1
-34,35c34
-< #if __cplusplus > 201703L
-< #include <bits/semaphore_base.h>
----
 > #include <version>
-37,38c36,51
-< #if __cpp_lib_atomic_wait || _GLIBCXX_HAVE_POSIX_SEMAPHORE
-< namespace std _GLIBCXX_VISIBILITY(default)
+32c30,32
+< #pragma GCC system_header
 ---
 > #if __cplusplus < 202002L
 > #   error c++20-semaphore.h requires C++20 
 > #endif
-> 
+34,35c34
+< #if __cplusplus > 201703L
+< #include <bits/semaphore_base.h>
+---
 > #if defined __GLIBCXX__ && !defined __cpp_lib_semaphore
+37,38c36,44
+< #if __cpp_lib_atomic_wait || _GLIBCXX_HAVE_POSIX_SEMAPHORE
+< namespace std _GLIBCXX_VISIBILITY(default)
+---
+> #define CXX20_CONCURRENCY_PREVENT_RECURSION
 > 
 > #include <bits/c++20-concurrency/global.h>
 > 
@@ -26,22 +34,28 @@
 > #include <bits/c++20-concurrency/semaphore_base.h>
 > 
 > namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
-> {
-> 
-> inline namespace CXX20_CONCURRENCY_NAMESPACE
-40d52
+40d45
 < _GLIBCXX_BEGIN_NAMESPACE_VERSION
-91,95c103,108
+42c47,48
+< #define __cpp_lib_semaphore 201907L
+---
+> inline namespace CXX20_CONCURRENCY_NAMESPACE
+> {
+89a96,102
+>   
+> } // namespace CXX20_CONCURRENCY_NAMESPACE
+> } // namespace std
+> 
+> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
+> 
+> #undef	CXX20_CONCURRENCY_PREVENT_RECURSION
+91,95c104,105
 < _GLIBCXX_END_NAMESPACE_VERSION
 < } // namespace
 < #endif // cpp_lib_atomic_wait || _GLIBCXX_HAVE_POSIX_SEMAPHORE
 < #endif // C++20
 < #endif // _GLIBCXX_SEMAPHORE
 ---
-> } // namespace CXX20_CONCURRENCY_NAMESPACE
-> } // namespace std
-> 
-> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
-> #endif // defined __GLIBCXX__ && __cplusplus >= 202002L && !defined __cpp_lib_semaphore
-> #endif // CXX20_CONCURRENCY_SEMAPHORE
+> #endif // defined __GLIBCXX__ && !defined __cpp_lib_semaphore
+> #endif // CXX20_SEMAPHORE_H
 \ No newline at end of file

@@ -118,17 +118,6 @@ add_library(
 	src/dummy.cc
 )
 
-target_compile_definitions(
-	${PROJECT_NAME}
-
-	PRIVATE
-		$<$<BOOL:${HAVE_GTHREADS}>:CXX20_CONCURRENCY_HAVE_GTHREADS=1>
-		$<$<BOOL:${HAVE_POSIX_SEMAPHORE}>:CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE=1>
-		$<$<BOOL:${HAVE_PTHREAD_COND_CLOCKWAIT}>:CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT=1>
-		$<$<BOOL:${HAVE_LINUX_FUTEX}>:CXX20_CONCURRENCY_HAVE_LINUX_FUTEX=1>
-		$<$<BOOL:${HAVE_LINUX_FUTEX_PRIVATE}>:CXX20_CONCURRENCY_HAVE_LINUX_FUTEX_PRIVATE=1>
-)
-
 target_include_directories(
 	${PROJECT_NAME}
 	
@@ -163,7 +152,7 @@ set_target_properties(
 )
 
 ###########################################################################
-# test files
+# test applications
 
 add_executable(
 	semaphore-test
@@ -172,6 +161,14 @@ add_executable(
 )
 
 target_link_libraries(semaphore-test PRIVATE ${PROJECT_NAME})
+
+add_executable(
+	barrier-test
+	
+	"test/barrier-test.cc"
+)
+
+target_link_libraries(barrier-test PRIVATE ${PROJECT_NAME})
 
 ###########################################################################
 # export and install the project
@@ -211,6 +208,7 @@ install(
 		include/bits/c++20-concurrency/atomic_wait.h
 		include/bits/c++20-concurrency/global.h
 		include/bits/c++20-concurrency/semaphore_base.h
+		include/c++20-barrier.h
 		include/c++20-concurrency.h
 		include/c++20-semaphore.h
 		"${CONFIG_HEADER_FILE}"
@@ -220,6 +218,7 @@ install(
 
 install(
 	FILES
+		include/std/barrier
 		include/std/semaphore
 		
 	DESTINATION "${INSTALL_INCLUDEDIR}/std"

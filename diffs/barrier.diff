@@ -1,0 +1,64 @@
+29,31c29,30
+< /** @file include/barrier
+<  *  This is a Standard C++ Library header.
+<  */
+---
+> #ifndef CXX20_BARRIER_H
+> #define CXX20_BARRIER_H 1
+33,34c32
+< #ifndef _GLIBCXX_BARRIER
+< #define _GLIBCXX_BARRIER 1
+---
+> #include <version>
+36c34,42
+< #pragma GCC system_header
+---
+> #if __cplusplus < 202002L
+> #   error c++20-barrier.h requires C++20
+> #endif
+> 
+> #if defined __GLIBCXX__ && !defined __cpp_lib_barrier
+> 
+> #define CXX20_CONCURRENCY_PREVENT_RECURSION
+> 
+> #include <bits/c++20-concurrency/global.h>
+38d43
+< #if __cplusplus > 201703L
+40,41c45,46
+< #if __cpp_lib_atomic_wait && __cpp_aligned_new
+< #include <bits/std_thread.h>
+---
+> #if defined CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT && __cpp_aligned_new
+> #include <thread>
+42a48
+> #include <bits/c++20-concurrency/atomic_wait.h>
+46c52,53
+< #define __cpp_lib_barrier 201907L
+---
+> namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
+> {
+48c55
+< namespace std _GLIBCXX_VISIBILITY(default)
+---
+> inline namespace CXX20_CONCURRENCY_NAMESPACE
+50d56
+< _GLIBCXX_BEGIN_NAMESPACE_VERSION
+178c184
+< 		__phase.notify_all();
+---
+> 		__atomic_notify_address(&_M_phase, true);
+255,259c261,268
+< _GLIBCXX_END_NAMESPACE_VERSION
+< } // namespace
+< #endif // __cpp_lib_atomic_wait && __cpp_aligned_new
+< #endif // __cplusplus > 201703L
+< #endif // _GLIBCXX_BARRIER
+---
+> } // namespace CXX20_CONCURRENCY_NAMESPACE
+> } // namespace std
+> #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT && __cpp_aligned_new
+> 
+> #undef	CXX20_CONCURRENCY_PREVENT_RECURSION
+> 
+> #endif // __GLIBCXX__ && !defined __cpp_lib_barrier
+> #endif // CXX20_BARRIER_H

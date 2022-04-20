@@ -30,8 +30,6 @@
 #ifndef CXX20_CONCURRENCY_ATOMIC_WAIT_H
 #define CXX20_CONCURRENCY_ATOMIC_WAIT_H 1
 
-#pragma GCC system_header
-
 #include <bits/c++20-concurrency/global.h>
 
 #include <bits/c++config.h>

@@ -24,5 +24,6 @@
 #define	CXX20_CONCURRENCY_H
 
 #include <c++20-semaphore.h>
+#include <c++20-barrier.h>
 
 #endif // CXX20_CONCURRENCY_H

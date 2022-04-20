@@ -22,12 +22,8 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-/** @file include/semaphore
- *  This is a Standard C++ Library header.
- */
-
-#ifndef CXX20_CONCURRENCY_SEMAPHORE
-#define CXX20_CONCURRENCY_SEMAPHORE 1
+#ifndef CXX20_SEMAPHORE_H
+#define CXX20_SEMAPHORE_H 1
 
 #include <version>
 
@@ -36,6 +32,8 @@
 #endif
 
 #if defined __GLIBCXX__ && !defined __cpp_lib_semaphore
+
+#define CXX20_CONCURRENCY_PREVENT_RECURSION
 
 #include <bits/c++20-concurrency/global.h>
 
@@ -48,8 +46,6 @@ namespace std CXX20_CONCURRENCY_VISIBILITY_ATTRIBUTE
 
 inline namespace CXX20_CONCURRENCY_NAMESPACE
 {
-
-#define __cpp_lib_semaphore 201907L
 
   template<ptrdiff_t __least_max_value = __semaphore_impl::_S_max>
     class counting_semaphore
@@ -102,5 +98,8 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 } // namespace std
 
 #endif // CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT || CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
-#endif // defined __GLIBCXX__ && __cplusplus >= 202002L && !defined __cpp_lib_semaphore
-#endif // CXX20_CONCURRENCY_SEMAPHORE
+
+#undef	CXX20_CONCURRENCY_PREVENT_RECURSION
+
+#endif // defined __GLIBCXX__ && !defined __cpp_lib_semaphore
+#endif // CXX20_SEMAPHORE_H

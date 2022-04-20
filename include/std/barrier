@@ -20,33 +20,19 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef CXX20_CONCURRENCY_CONFIG_H
-#define CXX20_CONCURRENCY_CONFIG_H
+#ifndef CXX20_CONCURRENCY_PREVENT_RECURSION
 
-// whether the thtreading library is gthreads
-#cmakedefine CXX20_CONCURRENCY_HAVE_GTHREADS 1
+#ifndef CXX20_CONCURRENCY_STD_BARRIER
+#define	CXX20_CONCURRENCY_STD_BARRIER
 
-// whether we have posix semaphores
-#cmakedefine CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE 1
+#include <version>
 
-// whether we have pthread_cond_clockwait
-#cmakedefine CXX20_CONCURRENCY_HAVE_PTHREAD_COND_CLOCKWAIT 1
-
-// whether we have the SYS_futex syscall
-#cmakedefine CXX20_CONCURRENCY_HAVE_LINUX_FUTEX 1
-
-// whether we have FUTEX_PRIVATE_FLAG
-#cmakedefine CXX20_CONCURRENCY_HAVE_LINUX_FUTEX_PRIVATE 1
-
-// the inline namespace used for the types
-#define CXX20_CONCURRENCY_NAMESPACE @CXX20_CONCURRENCY_NAMESPACE@
-
-// the ELF visibility used for the namespace
-#define CXX20_CONCURRENCY_VISIBILITY @CXX20_CONCURRENCY_VISIBILITY@
-
-// whether we have atomic wake support
-#if defined CXX20_CONCURRENCY_HAVE_GTHREADS || defined CXX20_CONCURRENCY_HAVE_LINUX_FUTEX
-#	define CXX20_CONCURRENCY_HAVE_ATOMIC_WAIT
+#ifdef __cpp_lib_barrier
+#	include_next <barrier>
+#else
+#	include <c++20-barrier.h>
 #endif
 
-#endif // CXX20_CONCURRENCY_CONFIG_H
+#endif // CXX20_CONCURRENCY_STD_BARRIER
+
+#endif // CXX20_CONCURRENCY_PREVENT_RECURSION
