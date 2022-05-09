@@ -11,7 +11,7 @@
 34c34,40
 < #if __cplusplus > 201703L
 ---
-> #if __cplusplus < 202002L
+> #if __cplusplus < 202002L && (!defined __GNUC__ || __cplusplus < 201709L) // GCC 10 defines __cplusplus as 201709L when using -std=c++2a
 > #   error c++20-latch.h requires C++20 
 > #endif
 > 

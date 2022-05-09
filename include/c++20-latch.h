@@ -31,8 +31,8 @@
 
 #include <version>
 
-#if __cplusplus < 202002L
-#   error c++20-latch.h requires C++20 
+#if __cplusplus < 202002L && (!defined __GNUC__ || __cplusplus < 201709L) // GCC 10 defines __cplusplus as 201709L when using -std=c++2a
+#	error c++20-latch.h requires C++20
 #endif
 
 #if defined __GLIBCXX__ && !defined __cpp_lib_latch
