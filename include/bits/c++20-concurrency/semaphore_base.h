@@ -135,7 +135,7 @@ inline namespace CXX20_CONCURRENCY_NAMESPACE
 
       for (;;)
 	{
-	  if (auto __err = sem_timedwait(&_M_semaphore, &__ts))
+	  if (sem_timedwait(&_M_semaphore, &__ts))
 	    {
 	      if (errno == EINTR)
 		continue;

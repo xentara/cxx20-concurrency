@@ -35,6 +35,10 @@
 < #ifdef _GLIBCXX_HAVE_POSIX_SEMAPHORE
 ---
 > #ifdef CXX20_CONCURRENCY_HAVE_POSIX_SEMAPHORE
+136c138
+< 	  if (auto __err = sem_timedwait(&_M_semaphore, &__ts))
+---
+> 	  if (sem_timedwait(&_M_semaphore, &__ts))
 185c187
 < #endif // _GLIBCXX_HAVE_POSIX_SEMAPHORE
 ---
